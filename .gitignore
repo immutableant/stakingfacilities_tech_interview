@@ -9,6 +9,7 @@ terraform/override.tf.json
 terraform/.terraformrc
 terraform/terraform.rc
 terraform/*.tfvars
+terraform/.terraform.tfstate.lock.info
 
 # Ansible files
 ansible/*.retry
