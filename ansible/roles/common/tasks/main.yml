@@ -1,0 +1,50 @@
+---
+- name: Install unzip
+  apt:
+    name: unzip
+    state: latest
+    update_cache: yes
+
+- name: Check if JWT secret exists
+  stat:
+    path: "{{ jwt_secret_path }}"
+  register: jwt_secret
+
+- name: Generate JWT secret if it does not exist
+  shell: openssl rand -hex 32 > {{ jwt_secret_path }}
+  when: not jwt_secret.stat.exists
+
+- name: Create the nimbus group
+  group:
+    name: nimbus
+    state: present
+
+- name: Create the nimbus user in the nimbus group
+  user:
+    name: nimbus
+    group: nimbus
+    create_home: yes
+    home: /var/lib/nimbus
+    state: present
+
+- name: Add nethermind user
+  user:
+    name: nethermind
+    shell: /bin/bash
+    create_home: yes
+
+- name: Set ACLs for jwt secret for nimbus user
+  acl:
+    path: "{{ jwt_secret_path }}"
+    entity: nimbus
+    etype: user
+    permissions: r
+    state: present
+
+- name: Set ACLs for jwt secret for nethermind user
+  acl:
+    path: "{{ jwt_secret_path }}"
+    entity: nethermind
+    etype: user
+    permissions: r
+    state: present

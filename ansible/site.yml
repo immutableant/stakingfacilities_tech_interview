@@ -1,0 +1,16 @@
+---
+- name: apply common configuration to all nodes
+  hosts: all
+  become: true
+
+  roles:
+    - common
+
+- name: configure and deploy ethfullnodes
+  hosts: ethfullnodes
+  become: true
+
+  roles:
+    - nimbus
+    - nethermind
+

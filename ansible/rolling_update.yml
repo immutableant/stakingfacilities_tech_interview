@@ -1,0 +1,23 @@
+---
+- hosts: ethfullnodes
+  serial: 1
+  become: true
+
+  # These are the tasks to run before applying updates:
+  pre_tasks:
+  - name: Stop nethermind service
+    systemd:
+      name: nethermind
+      state: stopped
+    ignore_errors: no
+
+  - name: Stop nimbus_beacon_node service
+    systemd:
+      name: nimbus_beacon_node
+      state: stopped
+    ignore_errors: no
+
+  roles:
+  - nimbus
+  - nethermind
+

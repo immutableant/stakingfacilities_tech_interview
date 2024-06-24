@@ -1,0 +1,67 @@
+---
+- name: Set soft nofile limit for nethermind
+  lineinfile:
+    path: /etc/security/limits.d/nethermind.conf
+    create: yes
+    line: "nethermind soft nofile 100000"
+
+- name: Set hard nofile limit for nethermind
+  lineinfile:
+    path: /etc/security/limits.d/nethermind.conf
+    line: "nethermind hard nofile 100000"
+    create: yes
+
+- name: Create directories as nethermind user
+  become_user: nethermind
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /home/nethermind/build
+    - /home/nethermind/data
+
+- name: Set nethermind .env file
+  become_user: nethermind
+  template:
+    src: env.j2
+    dest: /home/nethermind/.env
+    owner: nethermind
+    group: nethermind
+    mode: '0644'
+
+- name: Gather facts about nethermind service
+  service_facts:
+
+- name: Download latest version of nethermind
+  become_user: nethermind
+  shell: |
+    latest_release_url=$(curl -s {{ nethermind_latest_release_git_url }} | grep "browser_download_url" | grep "linux-x64" | cut -d '"' -f 4)
+    wget -O nethermind_latest_linux_x64.zip $latest_release_url
+    rm -rf ~/build/*
+    unzip -o nethermind_latest_linux_x64.zip -d ~/build
+    rm nethermind_latest_linux_x64.zip
+  when: "'nethermind.service' not in ansible_facts.services or ansible_facts.services['nethermind.service'].state != 'running'"
+
+- name: Download nethermind service file, enable it and run it
+  get_url:
+    url: "{{ nethermind_service_git_url }}"
+    dest: /etc/systemd/system/nethermind.service
+    owner: root
+    group: root
+    mode: '0644'
+  when: "'nethermind.service' not in ansible_facts.services or ansible_facts.services['nethermind.service'].state != 'running'"
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: true
+
+- name: Enable nethermind service to start on boot
+  systemd:
+    name: nethermind
+    enabled: yes
+
+- name: Start nethermind service
+  systemd:
+    name: nethermind
+    state: started
