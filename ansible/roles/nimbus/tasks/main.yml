@@ -1,7 +1,7 @@
 ---
 - name: Retrieve external IP address
   uri:
-    url: http://ifconfig.me/ip
+    url: "{{ external_ip_url }}"
     return_content: yes
   register: external_ip_response
 

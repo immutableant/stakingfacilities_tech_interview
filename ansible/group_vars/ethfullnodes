@@ -1,4 +1,7 @@
 ---
+## Check public ip url
+external_ip_url: http://ifconfig.me/ip
+
 ## Nethermind vars
 nethermind_service_git_url: https://raw.githubusercontent.com/NethermindEth/nethermind/master/scripts/nethermind.service
 nethermind_latest_release_git_url: https://api.github.com/repos/NethermindEth/nethermind/releases/latest

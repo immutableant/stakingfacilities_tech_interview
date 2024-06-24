@@ -189,7 +189,7 @@ ansible-playbook site.yml
 To update the configuration or apply updates to the infrastructure, run the rolling_update.yml playbook:
 
 ```sh
-ansible-playbook rolling_update.yml
+ansible-playbook update.yml
 ```
 
 ### Summary

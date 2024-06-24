@@ -1,6 +1,5 @@
 ---
 - hosts: ethfullnodes
-  serial: 1
   become: true
 
   # These are the tasks to run before applying updates:
